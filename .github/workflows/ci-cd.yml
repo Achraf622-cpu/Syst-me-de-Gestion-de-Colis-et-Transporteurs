@@ -52,7 +52,7 @@ jobs:
       run: docker build -t colis-app:${{ github.sha }} .
     
     - name: Save build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: colis-jar
         path: target/*.jar
