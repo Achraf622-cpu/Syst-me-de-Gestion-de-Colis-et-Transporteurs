@@ -47,3 +47,7 @@ docker-compose.override.yml
 ### Environment ###
 .env
 .env.local
+
+PROJECT_SUMMARY.md
+API_EXAMPLES.md
+API_GUIDE.md
