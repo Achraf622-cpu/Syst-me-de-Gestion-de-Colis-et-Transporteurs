@@ -42,11 +42,12 @@ jobs:
     - name: Run tests
       run: mvn test
       env:
-        SPRING_DATA_MONGODB_HOST: localhost
-        SPRING_DATA_MONGODB_PORT: 27017
-        SPRING_DATA_MONGODB_DATABASE: colis_db
-        SPRING_DATA_MONGODB_USERNAME: root
-        SPRING_DATA_MONGODB_PASSWORD: secret
+        MONGODB_HOST: localhost
+        MONGODB_PORT: 27017
+        MONGODB_DATABASE: colis_db
+        MONGODB_USERNAME: root
+        MONGODB_PASSWORD: secret
+        JWT_SECRET: TestSecretKeyForCIPipeline123456789!
     
     - name: Build Docker image
       run: docker build -t colis-app:${{ github.sha }} .
