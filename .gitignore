@@ -51,3 +51,5 @@ docker-compose.override.yml
 PROJECT_SUMMARY.md
 API_EXAMPLES.md
 API_GUIDE.md
+
+src/main/java/org/example/colis/security/README.md

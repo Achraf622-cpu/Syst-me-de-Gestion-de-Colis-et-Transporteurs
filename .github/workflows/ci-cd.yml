@@ -47,7 +47,7 @@ jobs:
         MONGODB_DATABASE: colis_db
         MONGODB_USERNAME: root
         MONGODB_PASSWORD: secret
-        JWT_SECRET: TestSecretKeyForCIPipeline123456789!
+        JWT_SECRET: MyS3cr3tK3yF0rJWTT0k3nG3n3r4t10nW1thM0r3Th4n256B1ts!
     
     - name: Build Docker image
       run: docker build -t colis-app:${{ github.sha }} .
