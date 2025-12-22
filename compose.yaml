@@ -25,6 +25,7 @@ services:
       - SPRING_DATA_MONGODB_USERNAME=root
       - SPRING_DATA_MONGODB_PASSWORD=secret
       - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=admin
+      - JWT_SECRET=b23c5972bbb8c2b63c9e6247e8f6650a189cd8047391c66c5c8901cbe8319bc25660ad2c
 
   mongo-express:
     image: mongo-express:latest

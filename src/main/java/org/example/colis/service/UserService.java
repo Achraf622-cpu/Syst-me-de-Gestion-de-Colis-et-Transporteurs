@@ -20,38 +20,38 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-    
+
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private UserMapper userMapper;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     public Page<UserDTO> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable)
                 .map(userMapper::toDTO);
     }
-    
+
     public Page<UserDTO> getAllTransporteurs(Pageable pageable) {
         return userRepository.findByRole(Role.TRANSPORTEUR, pageable)
                 .map(userMapper::toDTO);
     }
-    
+
     public Page<UserDTO> getTransporteursBySpecialite(Specialite specialite, Pageable pageable) {
         return userRepository.findByRoleAndSpecialite(Role.TRANSPORTEUR, specialite, pageable)
                 .map(userMapper::toDTO);
     }
-    
+
     public UserDTO createUser(CreateUserRequest request) {
         // Check if login already exists
         Optional<User> existing = userRepository.findByLogin(request.getLogin());
         if (existing.isPresent()) {
             throw new BusinessException("Login already exists");
         }
-        
+
         // Validate TRANSPORTEUR specific fields
         if (request.getRole() == Role.TRANSPORTEUR) {
             if (request.getSpecialite() == null) {
@@ -66,19 +66,19 @@ public class UserService {
                 throw new BusinessException("ADMIN cannot have specialite or statut");
             }
         }
-        
+
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setActive(true);
-        
+
         User saved = userRepository.save(user);
         return userMapper.toDTO(saved);
     }
-    
+
     public UserDTO updateUser(String id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        
+
         // Check if new login already exists
         if (request.getLogin() != null && !request.getLogin().equals(user.getLogin())) {
             Optional<User> existing = userRepository.findByLogin(request.getLogin());
@@ -87,15 +87,15 @@ public class UserService {
             }
             user.setLogin(request.getLogin());
         }
-        
+
         if (request.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        
+
         if (request.getActive() != null) {
             user.setActive(request.getActive());
         }
-        
+
         // Update TRANSPORTEUR specific fields
         if (user.getRole() == Role.TRANSPORTEUR) {
             if (request.getStatut() != null) {
@@ -105,20 +105,43 @@ public class UserService {
                 user.setSpecialite(request.getSpecialite());
             }
         }
-        
+
         User saved = userRepository.save(user);
         return userMapper.toDTO(saved);
     }
-    
+
     public void deleteUser(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         userRepository.delete(user);
     }
-    
+
     public UserDTO getUserById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         return userMapper.toDTO(user);
+    }
+
+    public UserDTO activateUser(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        user.setActive(true);
+        User saved = userRepository.save(user);
+        return userMapper.toDTO(saved);
+    }
+
+    public UserDTO deactivateUser(String id, String currentUserId) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // Prevent admin from deactivating themselves
+        if (id.equals(currentUserId)) {
+            throw new BusinessException("Cannot deactivate your own account");
+        }
+
+        user.setActive(false);
+        User saved = userRepository.save(user);
+        return userMapper.toDTO(saved);
     }
 }
