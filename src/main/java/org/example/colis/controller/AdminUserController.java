@@ -5,13 +5,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.example.colis.dto.CreateUserRequest;
+import org.example.colis.dto.PageResponse;
 import org.example.colis.dto.UpdateUserRequest;
 import org.example.colis.dto.UserDTO;
 import org.example.colis.enums.Specialite;
 import org.example.colis.model.User;
 import org.example.colis.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -32,31 +32,26 @@ public class AdminUserController {
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all users", description = "Get paginated list of all users")
-    public ResponseEntity<Page<UserDTO>> getAllUsers(
+    public ResponseEntity<PageResponse<UserDTO>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> users = userService.getAllUsers(pageable);
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(PageResponse.from(userService.getAllUsers(pageable)));
     }
 
     @GetMapping("/transporteurs")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all transporteurs", description = "Get paginated list of all transporteurs")
-    public ResponseEntity<Page<UserDTO>> getAllTransporteurs(
+    public ResponseEntity<PageResponse<UserDTO>> getAllTransporteurs(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) Specialite specialite) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<UserDTO> transporteurs;
 
         if (specialite != null) {
-            transporteurs = userService.getTransporteursBySpecialite(specialite, pageable);
-        } else {
-            transporteurs = userService.getAllTransporteurs(pageable);
+            return ResponseEntity.ok(PageResponse.from(userService.getTransporteursBySpecialite(specialite, pageable)));
         }
-
-        return ResponseEntity.ok(transporteurs);
+        return ResponseEntity.ok(PageResponse.from(userService.getAllTransporteurs(pageable)));
     }
 
     @PostMapping("/transporteurs")
